@@ -31,7 +31,7 @@ For a separately licensed working project, set `BORDERTOWN_PROJECT` to its direc
 
 ## Development status
 
-The local project is actively testing new weapon models. MP7, PGM, M1911 and knife integrations exist; the new 9mm/Talon pistols and UZI have passed local gameplay checks. AR15, MP5, Barrett and other downloaded guns are undergoing integration. This repository does not claim every download is already playable or that visual polish is finished.
+The local project is actively testing new weapon models. MP7, PGM, M1911 and knife integrations exist; the new 9mm/Talon pistols have passed local gameplay checks. UZI and AR15 are undergoing aimed-fire continuity corrections. MP5, Barrett and other downloaded guns are undergoing integration. This repository does not claim every download is already playable or that visual polish is finished.
 
 ## Rights
 

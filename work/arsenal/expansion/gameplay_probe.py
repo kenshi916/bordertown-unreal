@@ -28,11 +28,12 @@ class GameplayProbe:
                 'M1911':['slide','barrel','hammer','trigger'],
                 'Pistol9mm':['slide','hammer','trigger'],'TalonPistol':['slide','hammer','trigger'],
                 'UZI':['root','charging_handle','magazine','trigger'],
+                'AR15':['root','magazine_joint','bolt_joint','charging_handle_joint','trigger_joint'],
                 'SwitchKnife':['blade','lock','button'],'MP7':['b_Bolt','b_Magazine','b_Trigger','slide','mag_01','mag_02']}.get(gun,[])
         self.bones=[b for b in wanted if self.mesh.does_socket_exist(b)]
         self.expected=self.pose();self.expected_source='initial runtime pose';self.reference_error=None
-        idle='/Game/BorderTownWeapons/Arsenal/'+gun+'/Animations/'+{'Ballista':'A_Ballista_Idle','PGM':'A_PGM_Idle','M1911':'A_M1911_Weapon_Idle','Pistol9mm':'A_Pistol9mm_Weapon_Idle','TalonPistol':'A_TalonPistol_Weapon_Idle','UZI':'A_UZI_Idle','SwitchKnife':'A_SwitchKnife_Idle_Weapon'}.get(gun,'')
-        if gun in ['Ballista','PGM','M1911','Pistol9mm','TalonPistol','UZI','SwitchKnife']:
+        idle='/Game/BorderTownWeapons/Arsenal/'+gun+'/Animations/'+{'Ballista':'A_Ballista_Idle','PGM':'A_PGM_Idle','M1911':'A_M1911_Weapon_Idle','Pistol9mm':'A_Pistol9mm_Weapon_Idle','TalonPistol':'A_TalonPistol_Weapon_Idle','UZI':'A_UZI_Idle','AR15':'A_AR15_Idle','SwitchKnife':'A_SwitchKnife_Idle_Weapon'}.get(gun,'')
+        if gun in ['Ballista','PGM','M1911','Pistol9mm','TalonPistol','UZI','AR15','SwitchKnife']:
             try:
                 seq=u.load_asset(idle);assert seq,idle
                 opt=u.AnimPoseEvaluationOptions();opt.set_editor_property('evaluation_type',u.AnimDataEvalType.COMPRESSED)
@@ -110,6 +111,7 @@ class GameplayProbe:
         ranges={b:{key:max((delta(self.expected[b],r['mechanisms_relative_to_root'][b])[key]for r in paired),default=0.)for key in ['position_cm','angle_deg']}for b in self.bones}
         file=self.out/(label+'_FrameTrace.json');file.write_text(json.dumps({'label':label,'expected_clip_token':token,'rows':rows,'errors':self.sample_errors},separators=(',',':')))
         summary={'trace':str(file),'frames':len(rows),'paired_samples':len(paired),'max_paired_clock_error_seconds':max(errors)if errors else None,
+                 'max_weapon_component_travel_cm':max((math.dist(rows[0]['weapon_component_world'][:3],r['weapon_component_world'][:3])for r in rows),default=0.),
                  'first_paired_game_delay_seconds':paired[0]['game_time']-self.start if paired else None,
                  'paired_hand_time_range':[min(r['hand_time']for r in paired),max(r['hand_time']for r in paired)]if paired else None,
                  'mechanism_ranges':ranges,'mechanism_range_scope':'matching paired clips only','clock_policy':'weapon clock matches hand clock clamped to mechanism clip duration','errors':list(self.sample_errors)}

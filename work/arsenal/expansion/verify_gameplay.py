@@ -14,7 +14,7 @@ BOLT_GUN=GUN in ['Ballista','PGM']
 PISTOL=GUN in ['M1911','Pistol9mm','TalonPistol']
 MAG_ACTOR=GUN=='MP7' or PISTOL
 INTEGRATED_MAG=GUN in ['UZI','AR15','MP5']
-MAG_BONE='magazine_joint' if GUN=='Ballista' else 'magazine'
+MAG_BONE='magazine_joint' if GUN in ('Ballista','AR15') else 'magazine'
 BOLT_SLIDE='bolt_joint' if GUN=='Ballista' else 'bolt_slide'
 BOLT_ROTATE='bolt_joint' if GUN=='Ballista' else 'bolt_rotate'
 SIDEARM=GUN=='SwitchKnife' or PISTOL
@@ -252,7 +252,9 @@ def run():
         if BOLT_GUN:
             trace=paired_result(GUN+'_AimedFire')
             check('aimed_bolt_cycles_in_aiming_space',trace['mechanism_ranges'][BOLT_SLIDE]['position_cm']>5 and trace['mechanism_ranges'][BOLT_ROTATE]['angle_deg']>40,fatal=False,measured=trace['mechanism_ranges'])
-        if INTEGRATED_MAG:paired_result(GUN+'_AimedFire')
+        if INTEGRATED_MAG:
+            trace=paired_result(GUN+'_AimedFire')
+            check('aimed_fire_keeps_weapon_near_aim_pose',trace['max_weapon_component_travel_cm']<8.,fatal=False,measured_cm=trace['max_weapon_component_travel_cm'],limit_cm=8.,note='Stationary aimed-fire smoke gate for a gross procedural/montage-space discontinuity; fine recoil polish is visually reviewed separately.')
         yield from capture('ADSAfireRecovery',True)
         inject('IA_Aim',0);yield from seconds(.6)
         before=int(call(weapon(),'GetCurrentAmmo'))
@@ -289,7 +291,7 @@ def run():
             mp7_trace_result(GUN+'_TacticalReload');mp7_ready('mp7_tactical_both_magazine_copies_reset')
         if INTEGRATED_MAG:
             trace=paired_result(GUN+'_TacticalReload')
-            check('integrated_tactical_magazine_moves',trace['mechanism_ranges'].get('magazine',{}).get('position_cm',0)>5,fatal=False,measured=trace['mechanism_ranges'])
+            check('integrated_tactical_magazine_moves',trace['mechanism_ranges'].get(MAG_BONE,{}).get('position_cm',0)>5,fatal=False,measured=trace['mechanism_ranges'])
             ready_pose('integrated_tactical_magazine_reseated')
         if BOLT_GUN:
             trace=paired_result(GUN+'_TacticalReload');ranges=trace['mechanism_ranges']
@@ -327,13 +329,13 @@ def run():
         if PISTOL:ready_pose('pistol_reload_closes_slide')
         if INTEGRATED_MAG:
             trace=paired_result(GUN+'_EmptyReload')
-            check('integrated_empty_magazine_moves',trace['mechanism_ranges'].get('magazine',{}).get('position_cm',0)>5,fatal=False,measured=trace['mechanism_ranges'])
+            check('integrated_empty_magazine_moves',trace['mechanism_ranges'].get(MAG_BONE,{}).get('position_cm',0)>5,fatal=False,measured=trace['mechanism_ranges'])
             ready_pose('integrated_empty_magazine_reseated')
             phase='integrated_reload_switch_interrupt'
             yield from action('IA_FireWeapon',.07);yield from seconds(.6)
             probe.begin(GUN+'_ReloadInterrupt','Reload' if GUN=='UZI' else 'TacticalReload');yield from action('IA_Reload')
-            yield from wait(lambda:probe.mechanism_delta('magazine')['position_cm']>3 or montage()is None,6)
-            check('interrupt_during_integrated_magazine_movement',probe.mechanism_delta('magazine')['position_cm']>3,fatal=False)
+            yield from wait(lambda:probe.mechanism_delta(MAG_BONE)['position_cm']>3 or montage()is None,6)
+            check('interrupt_during_integrated_magazine_movement',probe.mechanism_delta(MAG_BONE)['position_cm']>3,fatal=False)
             yield from action('IA_SecondaryWeapon');yield from wait(lambda:not is_selected(),8);yield from seconds(.4)
             yield from action(select);yield from wait(is_selected,8);yield from seconds(3)
             paired_result(GUN+'_ReloadInterrupt');ready_pose('integrated_interrupt_reequip_seated');yield from capture('ReloadInterruptedReequipped')
