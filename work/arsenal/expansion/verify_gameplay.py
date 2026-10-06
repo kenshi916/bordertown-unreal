@@ -7,14 +7,15 @@ sys.path.insert(0,str(P))
 from ue_expansion_common import OUT,DEST
 from gameplay_probe import GameplayProbe,MP7AttachmentProbe
 cmd=u.SystemLibrary.get_command_line()
-match=re.search(r'-ExpansionGun=(MP7|Ballista|SwitchKnife|PGM|M1911|Pistol9mm|TalonPistol|UZI|AR15|MP5)',cmd)
+match=re.search(r'-ExpansionGun=(MP7A1|MP7|Ballista|SwitchKnife|PGM|M1911|Pistol9mm|TalonPistol|UZI|AR15|MP5|BarrettM82|MCXSpearLT|HoneyBadger|Cobalt|Vector|DJMSniper)(?=\s|$)',cmd)
 assert match,'Missing explicit -ExpansionGun'
 GUN=match.group(1)
 BOLT_GUN=GUN in ['Ballista','PGM']
 PISTOL=GUN in ['M1911','Pistol9mm','TalonPistol']
 MAG_ACTOR=GUN=='MP7' or PISTOL
-INTEGRATED_MAG=GUN in ['UZI','AR15','MP5']
-MAG_BONE='magazine_joint' if GUN in ('Ballista','AR15') else 'magazine'
+INTEGRATED_MAG=GUN in ['UZI','AR15','MP5','BarrettM82','MCXSpearLT','HoneyBadger','Cobalt']
+SEMI_RIFLE=GUN=='BarrettM82'
+MAG_BONE='magazine_joint' if GUN in ('Ballista','AR15','MCXSpearLT','HoneyBadger','Cobalt') else 'magazine'
 BOLT_SLIDE='bolt_joint' if GUN=='Ballista' else 'bolt_slide'
 BOLT_ROTATE='bolt_joint' if GUN=='Ballista' else 'bolt_rotate'
 SIDEARM=GUN=='SwitchKnife' or PISTOL
@@ -268,6 +269,11 @@ def run():
         after=int(call(weapon(),'GetCurrentAmmo'));check('firing_consumes_ammo',0<before-after<=capacity,before=before,after=after)
         yield from seconds(.4)
         check('firing_stops_on_release',int(call(weapon(),'GetCurrentAmmo'))==after,fatal=False)
+        if SEMI_RIFLE:
+            before_hold=int(call(weapon(),'GetCurrentAmmo'))
+            yield from action('IA_FireWeapon',1.1);yield from seconds(.3)
+            check('semi_auto_one_shot_per_press',before_hold-int(call(weapon(),'GetCurrentAmmo'))==1,fatal=False)
+            ready_pose('semi_loaded_mechanisms_return_to_idle')
         if PISTOL:
             trace=paired_result(GUN+'_Fire')
             check('m1911_slide_cycles',trace['mechanism_ranges'].get('slide',{}).get('position_cm',0)>.5,fatal=False,measured=trace['mechanism_ranges'])
@@ -314,6 +320,9 @@ def run():
             yield from seconds(.2)
             check('m1911_empty_slide_locks_back',probe.mechanism_delta('slide')['position_cm']>1.,fatal=False,measured=probe.mechanism_delta('slide'))
             yield from capture('EmptySlideLocked')
+        if SEMI_RIFLE:
+            yield from seconds(.15)
+            check('empty_carrier_locks_back',probe.mechanism_delta('carrier')['position_cm']>1.,fatal=False,measured=probe.mechanism_delta('carrier'))
         yield from seconds(2)
         phase='empty_reload'
         automatic_reload=bool(montage() and 'reload' in path(montage()).lower())

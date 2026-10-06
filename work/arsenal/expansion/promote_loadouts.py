@@ -9,7 +9,7 @@ from public_paths import PROJECT
 choice=re.search(r'-ExpansionPromote=([A-Za-z0-9,]+)',u.SystemLibrary.get_command_line())
 assert choice,'Specify the exact validated weapons with -ExpansionPromote.'
 GUNS=choice.group(1).split(',')
-assert GUNS and len(GUNS)==len(set(GUNS)) and set(GUNS)<= {'Ballista','MP7','SwitchKnife','M1911','PGM','Pistol9mm','TalonPistol','UZI','AR15','MP5'},GUNS
+assert GUNS and len(GUNS)==len(set(GUNS)) and set(GUNS)<= {'Ballista','MP7','SwitchKnife','M1911','PGM','Pistol9mm','TalonPistol','UZI','AR15','MP5','BarrettM82','MCXSpearLT','HoneyBadger','Cobalt','Vector','MP7A1','DJMSniper'},GUNS
 R={'status':'running','preserved_existing_rows':True,'backups':[]}
 stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
 BACKUP=P/'backups'/('before_expansion_'+stamp)
@@ -53,7 +53,7 @@ try:
     butterfly=asset(DEST+'/Butterfly/DA_Weapon_Butterfly')
     karambit=asset('/Game/BorderTownWeapons/FlinkyKarambit/DA_Weapon_FlinkyKarambit')
     for gun in GUNS:
-        main,side=(ak,das[gun]) if gun in ['SwitchKnife','M1911','Pistol9mm','TalonPistol'] else (das[gun],butterfly if gun in ['MP7','UZI','MP5'] else karambit)
+        main,side=(ak,das[gun]) if gun in ['SwitchKnife','M1911','Pistol9mm','TalonPistol'] else (das[gun],butterfly if gun in ['MP7','UZI','MP5','Vector','MP7A1'] else karambit)
         row=existing[0].copy()
         for stem,value in [('PrimaryWeapon',main),('SecondaryWeapon',side),('PrimaryWeaponSkin',None),('SecondaryWeaponSkin',None)]:row.set_editor_property(field(row,stem),value)
         # Each new weapon supplies its own deliberately configured magazine and

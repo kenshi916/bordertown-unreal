@@ -28,3 +28,5 @@ The following source metadata was recorded during asset inspection. Models are r
 | [sniper animated](https://sketchfab.com/3d-models/sniper-animated-b48999a250b2433da59f705c371a49b2) | [DJMaesen](https://sketchfab.com/bumstrum) | [CC Attribution](http://creativecommons.org/licenses/by/4.0/) |
 | [pistol 9mm](https://sketchfab.com/3d-models/pistol-9mm-4477cfe3f4b342f4b5ebd3090b6b902f) | [DJMaesen](https://sketchfab.com/bumstrum) | [CC Attribution](http://creativecommons.org/licenses/by/4.0/) |
 | [animated pistol](https://sketchfab.com/3d-models/animated-pistol-30d1b612b2334a8294b02692b8c10cf1) | [DJMaesen](https://sketchfab.com/bumstrum) | [CC Attribution](http://creativecommons.org/licenses/by/4.0/) |
+| [shotgun animated](https://sketchfab.com/3d-models/shotgun-animated-226237e0f49c4f69a9fc5a78df6a236c) | [DJMaesen](https://sketchfab.com/bumstrum) | [CC Attribution](https://creativecommons.org/licenses/by/4.0/) |
+| [battle rifle animated](https://sketchfab.com/3d-models/battle-rifle-animated-83307e082fe14162960712d22d25b5e4) | [DJMaesen](https://sketchfab.com/bumstrum) | [CC Attribution-ShareAlike](https://creativecommons.org/licenses/by-sa/4.0/) |

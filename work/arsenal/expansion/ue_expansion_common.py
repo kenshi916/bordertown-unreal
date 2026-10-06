@@ -135,10 +135,12 @@ def assign_slots(mesh, materials):
         names = [str(slot.get_editor_property(k)) for k in ('imported_material_slot_name', 'material_slot_name')]
         match = next((name for name in names if name in materials), None)
         if match is None:
-            # FBX replaces spaces in source material slot names with underscores.
+            # FBX/Unreal may replace punctuation while preserving spaces.
+            # Normalize both sides, and reject any ambiguous source collision.
             normalized = {re.sub(r'[^A-Za-z0-9_]', '_', k): k for k in materials}
             assert len(normalized) == len(materials), 'Ambiguous normalized material names'
-            match = next((normalized[name] for name in names if name in normalized), None)
+            candidates = [re.sub(r'[^A-Za-z0-9_]', '_', name) for name in names]
+            match = next((normalized[name] for name in candidates if name in normalized), None)
         assert match is not None, dict(mesh=mesh.get_path_name(), unmatched=names, known=list(materials))
         slot.set_editor_property('material_interface', materials[match])
         slots[i] = slot

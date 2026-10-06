@@ -29,11 +29,18 @@ class GameplayProbe:
                 'Pistol9mm':['slide','hammer','trigger'],'TalonPistol':['slide','hammer','trigger'],
                 'UZI':['root','charging_handle','magazine','trigger'],
                 'AR15':['root','magazine_joint','bolt_joint','charging_handle_joint','trigger_joint'],
+                'MP5':['root','magazine','bolt','charging_handle','trigger'],
+                'BarrettM82':['root','magazine','carrier','bolt_head','trigger','barrel'],
+                'MCXSpearLT':['root','magazine_joint','bolt_joint','charging_handle_joint','trigger_joint'],
+                'HoneyBadger':['root','magazine_joint','charging_handle_joint','trigger_joint','dust_cover_joint'],
+                'Cobalt':['root','magazine_joint','bolt_joint','charging_handle_joint','trigger_joint'],
                 'SwitchKnife':['blade','lock','button'],'MP7':['b_Bolt','b_Magazine','b_Trigger','slide','mag_01','mag_02']}.get(gun,[])
         self.bones=[b for b in wanted if self.mesh.does_socket_exist(b)]
         self.expected=self.pose();self.expected_source='initial runtime pose';self.reference_error=None
-        idle='/Game/BorderTownWeapons/Arsenal/'+gun+'/Animations/'+{'Ballista':'A_Ballista_Idle','PGM':'A_PGM_Idle','M1911':'A_M1911_Weapon_Idle','Pistol9mm':'A_Pistol9mm_Weapon_Idle','TalonPistol':'A_TalonPistol_Weapon_Idle','UZI':'A_UZI_Idle','AR15':'A_AR15_Idle','SwitchKnife':'A_SwitchKnife_Idle_Weapon'}.get(gun,'')
-        if gun in ['Ballista','PGM','M1911','Pistol9mm','TalonPistol','UZI','AR15','SwitchKnife']:
+        idle='/Game/BorderTownWeapons/Arsenal/'+gun+'/Animations/'+{'Ballista':'A_Ballista_Idle','PGM':'A_PGM_Idle','M1911':'A_M1911_Weapon_Idle','Pistol9mm':'A_Pistol9mm_Weapon_Idle','TalonPistol':'A_TalonPistol_Weapon_Idle','UZI':'A_UZI_Idle','AR15':'A_AR15_Idle','MP5':'A_MP5_Idle','SwitchKnife':'A_SwitchKnife_Idle_Weapon'}.get(gun,'')
+        if gun=='BarrettM82':idle='/Game/BorderTownWeapons/Arsenal/BarrettM82/Animations/A_BarrettM82_Idle'
+        if gun in ['MCXSpearLT','HoneyBadger','Cobalt']:idle='/Game/BorderTownWeapons/Arsenal/'+gun+'/Animations/A_'+('MCX'if gun=='MCXSpearLT'else gun)+'_Idle'
+        if gun in ['Ballista','PGM','M1911','Pistol9mm','TalonPistol','UZI','AR15','MP5','BarrettM82','MCXSpearLT','HoneyBadger','Cobalt','SwitchKnife']:
             try:
                 seq=u.load_asset(idle);assert seq,idle
                 opt=u.AnimPoseEvaluationOptions();opt.set_editor_property('evaluation_type',u.AnimDataEvalType.COMPRESSED)
