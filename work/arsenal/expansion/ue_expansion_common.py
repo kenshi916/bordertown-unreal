@@ -17,7 +17,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 def owned(path):
     assert any(str(path).startswith(DEST + '/' + gun + '/')
-               for gun in ('Ballista', 'MP7', 'SwitchKnife', 'PGM', 'M1911', 'UZI', 'AR15', 'Cobalt', 'MP5', 'Pistol9mm', 'TalonPistol', 'BarrettM82', 'Vector', 'MCXSpearLT', 'HoneyBadger', 'MP7A1', 'DJMSniper')), path
+               for gun in ('Ballista', 'MP7', 'SwitchKnife', 'PGM', 'M1911', 'UZI', 'AR15', 'Cobalt', 'MP5', 'Pistol9mm', 'TalonPistol', 'BarrettM82', 'Vector', 'MCXSpearLT', 'HoneyBadger', 'MP7A1', 'DJMSniper', 'DJMShotgun')), path
 
 
 def import_fbx(filename, directory, name, skeleton=None, fps=60):

@@ -7,17 +7,18 @@ sys.path.insert(0,str(P))
 from ue_expansion_common import OUT,DEST
 from gameplay_probe import GameplayProbe,MP7AttachmentProbe
 cmd=u.SystemLibrary.get_command_line()
-match=re.search(r'-ExpansionGun=(MP7A1|MP7|Ballista|SwitchKnife|PGM|M1911|Pistol9mm|TalonPistol|UZI|AR15|MP5|BarrettM82|MCXSpearLT|HoneyBadger|Cobalt|Vector|DJMSniper)(?=\s|$)',cmd)
+match=re.search(r'-ExpansionGun=(MP7A1|MP7|Ballista|SwitchKnife|PGM|M1911|Pistol9mm|TalonPistol|UZI|AR15|MP5|BarrettM82|MCXSpearLT|HoneyBadger|Cobalt|Vector|DJMSniper|DJMShotgun)(?=\s|$)',cmd)
 assert match,'Missing explicit -ExpansionGun'
 GUN=match.group(1)
-BOLT_GUN=GUN in ['Ballista','PGM']
+BOLT_GUN=GUN in ['Ballista','PGM','DJMSniper']
 PISTOL=GUN in ['M1911','Pistol9mm','TalonPistol']
 MAG_ACTOR=GUN=='MP7' or PISTOL
-INTEGRATED_MAG=GUN in ['UZI','AR15','MP5','BarrettM82','MCXSpearLT','HoneyBadger','Cobalt']
+INTEGRATED_MAG=GUN in ['UZI','AR15','MP5','BarrettM82','MCXSpearLT','HoneyBadger','Cobalt','Vector']
 SEMI_RIFLE=GUN=='BarrettM82'
+PER_SHELL=GUN=='DJMShotgun'
 MAG_BONE='magazine_joint' if GUN in ('Ballista','AR15','MCXSpearLT','HoneyBadger','Cobalt') else 'magazine'
-BOLT_SLIDE='bolt_joint' if GUN=='Ballista' else 'bolt_slide'
-BOLT_ROTATE='bolt_joint' if GUN=='Ballista' else 'bolt_rotate'
+BOLT_SLIDE='bolt_joint' if GUN=='Ballista' else ('bolt' if GUN=='DJMSniper' else 'bolt_slide')
+BOLT_ROTATE='bolt_joint' if GUN=='Ballista' else ('bolt' if GUN=='DJMSniper' else 'bolt_rotate')
 SIDEARM=GUN=='SwitchKnife' or PISTOL
 CAPTURE_ONLY='-ExpansionPoseCaptureOnly' in cmd
 QA_CONFIG=globals().get('QA_CONFIG',{})
@@ -167,6 +168,8 @@ def run():
     if not is_selected():yield from action(select)
     yield from seconds(3)
     check('new_weapon_equipped',weapon() and ('BP_'+GUN) in weapon().get_class().get_name(),weapon=path(weapon()))
+    if QA_CONFIG.get('expected_weapon'):
+        check('exact_candidate_equipped',path(weapon().get_class())==QA_CONFIG['expected_weapon'],actual=path(weapon().get_class()))
     # Resolve streaming/compilation once while idle, before any active-clip trace.
     phase='finish_asset_loading'
     u.AutomationUtilsBlueprintLibrary.finish_all_asset_compilation()
@@ -180,7 +183,7 @@ def run():
     probe=GameplayProbe(GUN,pawn,hands,weapon(),world,OUT)
     R['pawn_skeletal_components']=probe.components()
     R['pose_reference']={'source':probe.expected_source,'error':probe.reference_error,'bones':probe.bones}
-    if BOLT_GUN or PISTOL or INTEGRATED_MAG or GUN=='SwitchKnife':
+    if BOLT_GUN or PISTOL or INTEGRATED_MAG or PER_SHELL or GUN=='SwitchKnife':
         check('idle_reference_evaluated',probe.reference_error is None,fatal=False,error=probe.reference_error)
         ready_pose('initial_mechanism_matches_authored_idle')
     R['glove_geometry_idle']=probe.glove_snapshot('Idle')
@@ -206,7 +209,10 @@ def run():
         R['glove_geometry_ads']=probe.glove_snapshot('ADS')
         yield from capture('ADS',True);inject('IA_Aim',0)
         R['status']='reference_poses_captured_not_gameplay_validated';checkpoint();return
-    if GUN=='SwitchKnife':
+    if PER_SHELL:
+        from verify_shotgun_flow import run_checks
+        yield from run_checks(globals())
+    elif GUN=='SwitchKnife':
         probe.begin('Switch_Inspect','Inspect');inspect_press()
         yield from seconds(.45);yield from capture('Inspect');yield from wait(lambda:montage()is None,15);yield from seconds(.25)
         paired_result('Switch_Inspect');ready_pose('inspect_returns_blade_open');switchknife_idle_delivery('after_inspect')
@@ -381,7 +387,7 @@ def run():
     check('switched_away',weapon() and ('BP_'+GUN)not in weapon().get_class().get_name())
     yield from action(select);yield from seconds(3)
     check('reequipped',weapon() and ('BP_'+GUN)in weapon().get_class().get_name())
-    if BOLT_GUN or PISTOL or INTEGRATED_MAG or GUN=='SwitchKnife':ready_pose('final_reequip_matches_idle_mechanisms')
+    if BOLT_GUN or PISTOL or INTEGRATED_MAG or PER_SHELL or GUN=='SwitchKnife':ready_pose('final_reequip_matches_idle_mechanisms')
     if BOLT_GUN:ballista_idle_delivery('reequipped')
     if GUN=='SwitchKnife':switchknife_idle_delivery('reequipped')
     if MAG_ACTOR:mp7_attachments('final_reequipped');mp7_ready('mp7_final_reequip_both_magazine_copies_reset')

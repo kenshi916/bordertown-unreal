@@ -9,7 +9,7 @@ from public_paths import PROJECT
 choice=re.search(r'-ExpansionPromote=([A-Za-z0-9,]+)',u.SystemLibrary.get_command_line())
 assert choice,'Specify the exact validated weapons with -ExpansionPromote.'
 GUNS=choice.group(1).split(',')
-assert GUNS and len(GUNS)==len(set(GUNS)) and set(GUNS)<= {'Ballista','MP7','SwitchKnife','M1911','PGM','Pistol9mm','TalonPistol','UZI','AR15','MP5','BarrettM82','MCXSpearLT','HoneyBadger','Cobalt','Vector','MP7A1','DJMSniper'},GUNS
+assert GUNS and len(GUNS)==len(set(GUNS)) and set(GUNS)<= {'Ballista','MP7','SwitchKnife','M1911','PGM','Pistol9mm','TalonPistol','UZI','AR15','MP5','BarrettM82','MCXSpearLT','HoneyBadger','Cobalt','Vector','MP7A1','DJMSniper','DJMShotgun'},GUNS
 R={'status':'running','preserved_existing_rows':True,'backups':[]}
 stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
 BACKUP=P/'backups'/('before_expansion_'+stamp)

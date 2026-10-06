@@ -31,7 +31,7 @@ For a separately licensed working project, set `BORDERTOWN_PROJECT` to its direc
 
 ## Development status
 
-The local project is actively testing new weapon models. MP7, PGM, M1911 and knife integrations exist; the new 9mm/Talon pistols have passed local gameplay checks. UZI, AR15 and MP5 have passed their current local gameplay and screenshot reviews after aimed-fire corrections. MCX, Honey Badger, Cobalt, Barrett, the animated shotgun and FAL battle rifle are in the integration queue. Akimbo pistols are deferred. These results support prototype playtests, not a claim that every download is playable or that final visual polish is finished.
+The local project is actively testing new weapon models. MP7, PGM, M1911 and knife integrations exist; the new 9mm/Talon pistols have passed local gameplay checks. UZI, AR15, MP5, MCX and Honey Badger have passed their current local gameplay and screenshot reviews after aimed-fire corrections. The animated shotgun has also passed its seven-shell reload, shot/pump, interruption and aimed-fire checks. Cobalt, Barrett, Vector, MP7A1, the animated sniper and FAL battle rifle are undergoing integration or optical corrections. Akimbo pistols are deferred. These results support prototype playtests, not a claim that every download is playable or that final visual polish is finished.
 
 ## Rights
 
